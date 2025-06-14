@@ -47,4 +47,34 @@ const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
     ],
     [network]
   );
+  const onError = useCallback((error: WalletError) => {
+    notify({
+      type: "error",
+      message: error.message ? `${error.name} : ${error.message}` : error.name,
+    });
+  }, []);
+
+  return (
+    <ConnectionProvider endpoint={endpoint}>
+      <WalletProvider
+        wallets={wallets}
+        onError={onError}
+        autoConnect={autoConnect}
+      >
+        <ReactUIWalletModalProvider>{children}</ReactUIWalletModalProvider>
+      </WalletProvider>
+    </ConnectionProvider>
+  );
+};
+
+export const ConnectionProvider: FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  return (
+    <NetworkConfigurationProvider>
+      <AutoConnectProvider>
+        <WalletContextProvider>{children}</WalletContextProvider>
+      </AutoConnectProvider>
+    </NetworkConfigurationProvider>
+  );
 };
